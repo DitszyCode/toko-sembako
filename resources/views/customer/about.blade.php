@@ -50,7 +50,7 @@
                 </div>
                 <div class="absolute -bottom-6 -right-6 w-32 h-32 glass-card rounded-2xl flex items-center justify-center">
                     <div class="text-center">
-                        <p class="text-3xl font-bold text-green-400">14+</p>
+                        <p class="text-3xl font-bold text-green-400">{{ $stats['orders'] > 0 ? floor($stats['orders'] / 365) . '+' : '1+' }}</p>
                         <p class="text-green-200/60 text-sm">Tahun</p>
                     </div>
                 </div>
@@ -156,21 +156,22 @@
     <div class="container mx-auto px-4 lg:px-8">
         <div class="glass-card rounded-3xl p-8 lg:p-12 bg-gradient-to-r from-green-600 to-green-700">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                @php
-                    $stats = [
-                        ['value' => '50.000+', 'label' => 'Pelanggan Puas'],
-                        ['value' => '1000+', 'label' => 'Produk Tersedia'],
-                        ['value' => '100+', 'label' => 'Kota Terjangkau'],
-                        ['value' => '4.9/5', 'label' => 'Rating Pelanggan'],
-                    ];
-                @endphp
-
-                @foreach($stats as $stat)
-                    <div class="text-center">
-                        <p class="text-3xl lg:text-4xl font-bold text-white mb-2">{{ $stat['value'] }}</p>
-                        <p class="text-green-100">{{ $stat['label'] }}</p>
-                    </div>
-                @endforeach
+                <div class="text-center">
+                    <p class="text-3xl lg:text-4xl font-bold text-white mb-2">{{ number_format($stats['customers']) }}+</p>
+                    <p class="text-green-100">Pelanggan Puas</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl lg:text-4xl font-bold text-white mb-2">{{ number_format($stats['products']) }}+</p>
+                    <p class="text-green-100">Produk Tersedia</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl lg:text-4xl font-bold text-white mb-2">{{ number_format($stats['orders']) }}+</p>
+                    <p class="text-green-100">Pesanan Selesai</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl lg:text-4xl font-bold text-white mb-2">{{ $stats['categories'] }}+</p>
+                    <p class="text-green-100">Kategori</p>
+                </div>
             </div>
         </div>
     </div>

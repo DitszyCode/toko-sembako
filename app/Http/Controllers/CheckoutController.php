@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,13 @@ use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
+    protected $midtrans;
+
+    public function __construct(MidtransService $midtrans)
+    {
+        $this->midtrans = $midtrans;
+    }
+
     /**
      * Display the checkout page.
      */
@@ -77,7 +85,11 @@ class CheckoutController extends Controller
 
         $user = Auth::check() ? Auth::user() : null;
 
-        return view('customer.checkout', compact('items', 'subtotal', 'shipping', 'total', 'user'));
+        // Get Midtrans client key
+        $midtransClientKey = $this->midtrans->getClientKey();
+        $midtransIsProduction = $this->midtrans->isProduction();
+
+        return view('customer.checkout', compact('items', 'subtotal', 'shipping', 'total', 'user', 'midtransClientKey', 'midtransIsProduction'));
     }
 
     /**
@@ -172,25 +184,27 @@ class CheckoutController extends Controller
                     'unit' => $item['unit'],
                     'subtotal' => $item['subtotal'],
                 ]);
-
-                // Update product stock
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    $product->decrement('stock', $item['quantity']);
-                }
-            }
-
-            // Clear cart
-            if (Auth::check()) {
-                Cart::where('user_id', Auth::id())->delete();
-            } else {
-                Session::forget('cart');
             }
 
             DB::commit();
 
-            return redirect()->route('orders.show', $order->id)
-                ->with('success', 'Pesanan berhasil dibuat!');
+            // Get Midtrans snap token
+            try {
+                $snapData = $this->midtrans->createTransaction($order, $items);
+                $snapToken = $snapData['token'] ?? null;
+                $redirectUrl = $snapData['redirect_url'] ?? null;
+
+                // Store snap token in session
+                session(['midtrans_snap_token' => $snapToken]);
+                session(['midtrans_order_id' => $order->id]);
+
+                return view('customer.checkout-payment', compact('order', 'snapToken', 'redirectUrl', 'items'));
+            } catch (\Exception $e) {
+                // If Midtrans fails, show error but keep order
+                return redirect()->back()
+                    ->with('error', 'Gagal membuat transaksi pembayaran: ' . $e->getMessage())
+                    ->withInput();
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -199,5 +213,119 @@ class CheckoutController extends Controller
                 ->with('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.')
                 ->withInput();
         }
+    }
+
+    /**
+     * Handle Midtrans payment notification (webhook)
+     */
+    public function notification(Request $request)
+    {
+        $notification = $request->all();
+
+        if (empty($notification)) {
+            return response()->json(['message' => 'No notification'], 400);
+        }
+
+        $result = $this->midtrans->handleNotification($notification);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Handle payment finish from Midtrans
+     */
+    public function finish(Request $request, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+
+        // Update order status based on transaction result
+        if ($request->has('status_id') && $request->status_id == '200') {
+            $order->payment_status = 'paid';
+            $order->status = 'processing';
+            $order->save();
+
+            // Clear cart after successful payment
+            if (Auth::check()) {
+                Cart::where('user_id', Auth::id())->delete();
+            } else {
+                Session::forget('cart');
+            }
+
+            // Update product stock
+            $orderItems = OrderItem::where('order_id', $order->id)->get();
+            foreach ($orderItems as $item) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $product->decrement('stock', $item->quantity);
+                }
+            }
+
+            return redirect()->route('orders.show', $order->id)
+                ->with('success', 'Pembayaran berhasil! Pesanan Anda sedang diproses.');
+        }
+
+        return redirect()->route('orders.show', $order->id)
+            ->with('info', 'Pembayaran sedang diproses. Status akan diperbarui otomatis.');
+    }
+
+    /**
+     * Show payment page for existing order
+     */
+    public function payment($orderId)
+    {
+        $order = Order::with('items')->findOrFail($orderId);
+
+        // Check if user owns this order
+        if (Auth::check() && $order->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        // Get order items for Midtrans
+        $items = $order->items->map(function ($item) {
+            return [
+                'product_id' => $item->product_id,
+                'product_name' => $item->product_name,
+                'product_price' => $item->product_price,
+                'quantity' => $item->quantity,
+                'unit' => $item->unit,
+                'subtotal' => $item->subtotal,
+            ];
+        })->toArray();
+
+        // Get Midtrans snap token
+        try {
+            $snapData = $this->midtrans->createTransaction($order, $items);
+            $snapToken = $snapData['token'] ?? null;
+            $redirectUrl = $snapData['redirect_url'] ?? null;
+        } catch (\Exception $e) {
+            return redirect()->route('orders.show', $order->id)
+                ->with('error', 'Gagal memuat halaman pembayaran: ' . $e->getMessage());
+        }
+
+        $midtransClientKey = $this->midtrans->getClientKey();
+
+        return view('customer.checkout-payment', compact('order', 'snapToken', 'redirectUrl', 'items', 'midtransClientKey'));
+    }
+
+    /**
+     * Handle payment error
+     */
+    public function error(Request $request, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+
+        return redirect()->route('orders.show', $order->id)
+            ->with('error', 'Pembayaran gagal. Silakan coba lagi.');
+    }
+
+    /**
+     * Handle payment unfinish
+     */
+    public function unfinish(Request $request, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+
+        return redirect()->route('orders.show', $order->id)
+            ->with('warning', 'Pembayaran belum selesai. Silakan selesaikan pembayaran.');
     }
 }

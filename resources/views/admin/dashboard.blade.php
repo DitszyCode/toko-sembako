@@ -44,14 +44,16 @@
             <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
                 <i class="fas fa-money-bill-wave text-green-400 text-lg"></i>
             </div>
-            <span class="trend-up text-xs font-semibold flex items-center gap-1">
-                <i class="fas fa-arrow-up"></i> +12%
-            </span>
+            @if(($stats['revenue_growth'] ?? 0) != 0)
+                <span class="trend-up text-xs font-semibold flex items-center gap-1">
+                    <i class="fas fa-arrow-up"></i> {{ abs($stats['revenue_growth']) }}%
+                </span>
+            @endif
         </div>
         <p class="text-gray-400 text-sm mt-4 mb-1">Total Pendapatan</p>
         <p class="text-2xl font-bold text-white">Rp {{ number_format($stats['total_revenue'] ?? 0, 0, ',', '.') }}</p>
         <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full bg-green-500 rounded-full" style="width: 75%"></div>
+            <div class="h-full bg-green-500 rounded-full" style="width: {{ min(($stats['total_revenue'] / ($stats['revenue_target'] ?? 10000000)) * 100, 100) }}%"></div>
         </div>
     </div>
 
@@ -61,14 +63,16 @@
             <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
                 <i class="fas fa-shopping-bag text-blue-400 text-lg"></i>
             </div>
-            <span class="trend-up text-xs font-semibold flex items-center gap-1">
-                <i class="fas fa-arrow-up"></i> +8%
-            </span>
+            @if(($stats['orders_growth'] ?? 0) != 0)
+                <span class="trend-up text-xs font-semibold flex items-center gap-1">
+                    <i class="fas fa-arrow-up"></i> {{ abs($stats['orders_growth']) }}%
+                </span>
+            @endif
         </div>
         <p class="text-gray-400 text-sm mt-4 mb-1">Total Pesanan</p>
         <p class="text-2xl font-bold text-white">{{ $stats['total_orders'] ?? 0 }}</p>
         <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full bg-blue-500 rounded-full" style="width: 60%"></div>
+            <div class="h-full bg-blue-500 rounded-full" style="width: {{ min(($stats['total_orders'] / ($stats['orders_target'] ?? 100)) * 100, 100) }}%"></div>
         </div>
     </div>
 
@@ -102,7 +106,7 @@
         <p class="text-gray-400 text-sm mt-4 mb-1">Total Produk</p>
         <p class="text-2xl font-bold text-white">{{ $stats['total_products'] ?? 0 }}</p>
         <div class="mt-3 h-1 bg-gray-700 rounded-full overflow-hidden">
-            <div class="h-full bg-purple-500 rounded-full" style="width: 85%"></div>
+            <div class="h-full bg-purple-500 rounded-full" style="width: {{ min(($stats['total_products'] / ($stats['products_target'] ?? 100)) * 100, 100) }}%"></div>
         </div>
     </div>
 </div>

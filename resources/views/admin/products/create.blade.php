@@ -77,6 +77,16 @@
                 </div>
 
                 <div>
+                    <label for="brand" class="block text-sm font-medium text-gray-300 mb-2">Merek</label>
+                    <input type="text" name="brand" id="brand" value="{{ old('brand') }}"
+                        class="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Contoh: Bimoli, Indomie, Gulaku">
+                    @error('brand')
+                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Status</label>
                     <div class="flex items-center gap-6">
                         <label class="flex items-center cursor-pointer">

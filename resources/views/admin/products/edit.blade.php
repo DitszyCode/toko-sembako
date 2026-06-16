@@ -48,6 +48,10 @@
                 </select>
             </div>
             <div>
+                <label class="block text-gray-300 text-sm mb-2">Merek</label>
+                <input type="text" name="brand" value="{{ old('brand', $product->brand) }}" class="w-full bg-gray-700 border border-gray-600 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Contoh: Bimoli, Indomie, Gulaku">
+            </div>
+            <div>
                 <label class="block text-gray-300 text-sm mb-2">Gambar Produk</label>
                 @if($product->image)
                 <div class="mb-3"><img src="{{ $product->image }}" class="w-24 h-24 object-cover rounded-xl"></div>

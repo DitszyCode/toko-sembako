@@ -220,9 +220,10 @@
 
                     <div class="space-y-3">
                         @if ($order->status === 'pending')
-                            <button class="w-full glass-btn py-4 rounded-xl text-white font-semibold text-center">
+                            <a href="{{ route('checkout.payment', $order->id) }}" class="w-full glass-btn py-4 rounded-xl text-white font-semibold text-center flex items-center justify-center gap-2">
+                                <i class="fas fa-credit-card"></i>
                                 Bayar Sekarang
-                            </button>
+                            </a>
                         @endif
                         <button class="w-full glass py-3 rounded-xl text-white text-sm hover:bg-white/20 transition flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

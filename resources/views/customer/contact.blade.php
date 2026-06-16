@@ -50,10 +50,10 @@
                         <div>
                             <h3 class="text-white font-semibold text-lg mb-2">Alamat</h3>
                             <p class="text-green-100">
-                                Jl. Merdeka No. 123<br>
-                                RT 01/RW 02, Kelurahan Sukamaju<br>
-                                Kecamatan Cicadas, Kota Bandung<br>
-                                Jawa Barat 40121
+                                Jl. Tembok Dukuh V/50<br>
+                                RT 01/RW 02, Kelurahan Bubutan<br>
+                                Kecamatan Bubutan, Kota Surabaya<br>
+                                Jawa timur 60173
                             </p>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                         </div>
                         <div>
                             <h3 class="text-white font-semibold text-lg mb-2">Telepon</h3>
-                            <p class="text-green-100 mb-2">+62 812-3456-7890</p>
+                            <p class="text-green-100 mb-2">+62 857-7116-8204</p>
                             <p class="text-green-200/60 text-sm">WhatsApp juga tersedia</p>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                         </div>
                         <div>
                             <h3 class="text-white font-semibold text-lg mb-2">Email</h3>
-                            <p class="text-green-100 mb-2">info@tokosembako.com</p>
+                            <p class="text-green-100 mb-2">adityaramadhanikita.x13@gmail.com</p>
                             <p class="text-green-200/60 text-sm">Respon dalam 1x24 jam</p>
                         </div>
                     </div>
@@ -266,9 +266,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Koordinat toko (ganti dengan lokasi asli Anda)
-        var lat = -6.9025247;
-        var lng = 107.6186311;
+        // Koordinat toko
+        var lat = -7.253639508431685;
+        var lng = 112.72347948169569;
 
         var map = L.map('contact-map', {
             center: [lat, lng],
@@ -294,7 +294,7 @@
 
         L.marker([lat, lng], { icon: icon })
             .addTo(map)
-            .bindPopup('<div class="map-popup-title">Toko Sembako</div><p class="map-popup-desc">Jl. Merdeka No. 123, Bandung</p>')
+            .bindPopup('<div class="map-popup-title">Toko Sembako</div><p class="map-popup-desc">Jl. Tembok Dukuh V/50, Surabaya</p>')
             .openPopup();
     });
 </script>

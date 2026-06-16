@@ -439,25 +439,39 @@
                         {{-- Quick Tags --}}
                         <div class="hero-tags flex flex-wrap gap-2">
                             <span class="text-white/60 text-sm self-center">Populer:</span>
-                            @php $popularSearches = ['Beras 5kg', 'Minyak Goreng', 'Gula Pasir', 'Indomie', 'Sabun Cuci']; @endphp
-                            @foreach($popularSearches as $i => $keyword)
+                            @forelse($popularSearches as $i => $keyword)
                                 <a href="{{ route('products', ['search' => $keyword]) }}"
                                    class="search-tag-link bg-white/15 hover:bg-white/30 border border-white/25 text-white/85 text-xs px-3 py-1.5 rounded-full"
                                    style="animation: fadeInUp 0.5s {{ 0.55 + $i * 0.08 }}s ease both;">
                                     {{ $keyword }}
                                 </a>
-                            @endforeach
+                            @empty
+                                <a href="{{ route('products', ['sort' => 'popular']) }}"
+                                   class="search-tag-link bg-white/15 hover:bg-white/30 border border-white/25 text-white/85 text-xs px-3 py-1.5 rounded-full">
+                                    Lihat Produk
+                                </a>
+                            @endforelse
                         </div>
                     </div>
 
                     {{-- Right Stats --}}
                     <div class="flex-shrink-0 hidden lg:grid grid-cols-2 gap-4">
-                        @foreach([['500+','Produk'],['10rb+','Pelanggan'],['4.9 ★','Rating'],['<24 jam','Pengiriman']] as $s)
                         <div class="hero-stat-card glass-card rounded-2xl p-5 text-center hover:scale-105 transition-transform duration-300 cursor-default">
-                            <div class="text-3xl font-bold text-white">{{ $s[0] }}</div>
-                            <div class="text-white/70 text-sm mt-1">{{ $s[1] }}</div>
+                            <div class="text-3xl font-bold text-white">{{ $stats['products'] }}+</div>
+                            <div class="text-white/70 text-sm mt-1">Produk</div>
                         </div>
-                        @endforeach
+                        <div class="hero-stat-card glass-card rounded-2xl p-5 text-center hover:scale-105 transition-transform duration-300 cursor-default">
+                            <div class="text-3xl font-bold text-white">{{ number_format($stats['customers']) }}+</div>
+                            <div class="text-white/70 text-sm mt-1">Pelanggan</div>
+                        </div>
+                        <div class="hero-stat-card glass-card rounded-2xl p-5 text-center hover:scale-105 transition-transform duration-300 cursor-default">
+                            <div class="text-3xl font-bold text-white">{{ number_format($stats['rating'], 1) }} ★</div>
+                            <div class="text-white/70 text-sm mt-1">Rating</div>
+                        </div>
+                        <div class="hero-stat-card glass-card rounded-2xl p-5 text-center hover:scale-105 transition-transform duration-300 cursor-default">
+                            <div class="text-3xl font-bold text-white">{{ $stats['avg_delivery'] }}</div>
+                            <div class="text-white/70 text-sm mt-1">Pengiriman</div>
+                        </div>
                     </div>
 
                 </div>
@@ -564,15 +578,8 @@
                 @endphp
                 @forelse($categories as $i => $category)
                     @php
-                        $mapped = null;
-                        foreach ($iconMap as $key => $val) {
-                            if (str_contains(strtolower($category->slug), $key) || str_contains(strtolower($category->name), $key)) {
-                                $mapped = $val;
-                                break;
-                            }
-                        }
-                        $iconClass = $mapped['icon'] ?? ($category->icon ?? 'fa-box');
-                        $iconColor = $mapped['color'] ?? 'from-green-500 to-emerald-500';
+                        $iconClass = $category->icon ?? 'fa-box';
+                        $iconColor = $category->color ?? 'from-green-500 to-emerald-500';
                     @endphp
                     <a href="{{ route('products', ['category' => $category->slug]) }}"
                        class="group reveal delay-{{ min(($i+1)*50, 400) }}">
@@ -585,32 +592,10 @@
                         </div>
                     </a>
                 @empty
-                    @php
-                        $defaultCategories = [
-                            ['name'=>'Beras & Gandum',      'icon'=>'fa-wheat-awn',      'color'=>'from-amber-500 to-yellow-500'],
-                            ['name'=>'Minyak & Goreng',     'icon'=>'fa-droplet',        'color'=>'from-orange-500 to-red-500'],
-                            ['name'=>'Gula & Garam',        'icon'=>'fa-cube',           'color'=>'from-pink-500 to-rose-500'],
-                            ['name'=>'Makanan Kaleng',      'icon'=>'fa-can-food',       'color'=>'from-purple-500 to-indigo-500'],
-                            ['name'=>'Minuman',             'icon'=>'fa-wine-bottle',     'color'=>'from-blue-500 to-cyan-500'],
-                            ['name'=>'Mie & Pasta',         'icon'=>'fa-bowl-food',       'color'=>'from-red-500 to-orange-500'],
-                            ['name'=>'Bumbu & Rempah',     'icon'=>'fa-pepper-hot',     'color'=>'from-yellow-600 to-amber-500'],
-                            ['name'=>'Saus & Kecap',        'icon'=>'fa-wine-glass',     'color'=>'from-red-700 to-red-500'],
-                            ['name'=>'Snack & Kue',        'icon'=>'fa-cookie',         'color'=>'from-pink-400 to-purple-500'],
-                            ['name'=>'Sabun & Deterjen',   'icon'=>'fa-bottle-droplet', 'color'=>'from-teal-500 to-emerald-500'],
-                            ['name'=>'Perawatan Rumah',     'icon'=>'fa-spray-can',      'color'=>'from-cyan-500 to-blue-500'],
-                            ['name'=>'Perlengkapan Dapur', 'icon'=>'fa-utensils',       'color'=>'from-gray-500 to-gray-700'],
-                        ];
-                    @endphp
-                    @foreach($defaultCategories as $i => $category)
-                        <a href="{{ route('products') }}" class="group reveal delay-{{ min(($i+1)*50+100, 500) }}">
-                            <div class="cat-card glass-card rounded-2xl p-5 text-center">
-                                <div class="cat-icon-wrap w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br {{ $category['color'] }} flex items-center justify-center">
-                                    <i class="fas {{ $category['icon'] }} text-white text-xl"></i>
-                                </div>
-                                <h3 class="text-white font-medium text-sm">{{ $category['name'] }}</h3>
-                            </div>
-                        </a>
-                    @endforeach
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-tags text-white/30 text-5xl mb-4"></i>
+                        <p class="text-white/60">Belum ada kategori</p>
+                    </div>
                 @endforelse
             </div>
         </div>
@@ -886,36 +871,34 @@
         <div class="container mx-auto px-4 lg:px-8">
             <div class="text-center mb-10 reveal">
                 <h2 class="text-2xl lg:text-3xl font-bold text-white section-heading inline-block">Kata Pelanggan Kami</h2>
-                <p class="text-white/70 mt-3">Lebih dari 10.000 pelanggan puas berbelanja di sini</p>
+                <p class="text-white/70 mt-3">{{ number_format($stats['customers']) }}+ pelanggan puas berbelanja di sini</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                @php
-                    $testimonials = [
-                        ['name'=>'Budi Santoso', 'location'=>'Jakarta',  'comment'=>'Pelayanan sangat memuaskan! Barang datang tepat waktu dan kondisinya sempurna.', 'rating'=>5],
-                        ['name'=>'Siti Rahayu',  'location'=>'Bandung',  'comment'=>'Harga sangat terjangkau, cocok banget buat belanja bulanan keluarga besar.', 'rating'=>5],
-                        ['name'=>'Ahmad Fauzi',  'location'=>'Surabaya', 'comment'=>'Recommend banget! Stok selalu lengkap dan proses checkoutnya mudah sekali.', 'rating'=>4],
-                    ];
-                @endphp
-                @foreach($testimonials as $i => $t)
+                @forelse($testimonials as $i => $review)
                     <div class="testi-card glass-card rounded-2xl p-6 reveal delay-{{ $i*150 }}">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="testi-avatar w-11 h-11 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
-                                <span class="text-white font-bold">{{ substr($t['name'], 0, 1) }}</span>
+                                <span class="text-white font-bold">{{ strtoupper(substr($review->user->name ?? 'U', 0, 1)) }}</span>
                             </div>
                             <div>
-                                <h4 class="text-white font-semibold text-sm">{{ $t['name'] }}</h4>
-                                <p class="text-white/60 text-xs">{{ $t['location'] }}</p>
+                                <h4 class="text-white font-semibold text-sm">{{ $review->user->name ?? 'Pelanggan' }}</h4>
+                                <p class="text-white/60 text-xs">{{ $review->user->address ?? '' }}</p>
                             </div>
                         </div>
                         <div class="flex gap-0.5 mb-3">
                             @for($j = 0; $j < 5; $j++)
-                                <i class="fas fa-star text-sm {{ $j < $t['rating'] ? 'text-yellow-400' : 'text-white/20' }}"
-                                   style="{{ $j < $t['rating'] ? 'animation: bounce-in 0.4s '.($j*0.08+0.2).'s ease both;' : '' }}"></i>
+                                <i class="fas fa-star text-sm {{ $j < $review->rating ? 'text-yellow-400' : 'text-white/20' }}"
+                                   style="{{ $j < $review->rating ? 'animation: bounce-in 0.4s '.($j*0.08+0.2).'s ease both;' : '' }}"></i>
                             @endfor
                         </div>
-                        <p class="text-white/75 text-sm italic leading-relaxed">"{{ $t['comment'] }}"</p>
+                        <p class="text-white/75 text-sm italic leading-relaxed">"{{ $review->comment }}"</p>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-comments text-white/30 text-5xl mb-4"></i>
+                        <p class="text-white/60">Belum ada review</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>

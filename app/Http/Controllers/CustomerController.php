@@ -113,7 +113,16 @@ class CustomerController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('customer.categories', compact('categories'));
+        // Get unique brands from products
+        $brands = Product::whereNotNull('brand')
+            ->where('brand', '!=', '')
+            ->distinct()
+            ->pluck('brand')
+            ->filter()
+            ->take(12)
+            ->values();
+
+        return view('customer.categories', compact('categories', 'brands'));
     }
 
     /**

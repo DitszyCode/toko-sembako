@@ -6,8 +6,10 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Banner;
 use App\Models\Order;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -36,11 +38,43 @@ class HomeController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        // Dynamic stats from database
+        $stats = [
+            'products' => Cache::remember('total_products', 3600, fn() => Product::count()),
+            'customers' => Cache::remember('total_customers', 3600, fn() => \App\Models\User::where('role', 'customer')->count()),
+            'rating' => Cache::remember('avg_rating', 3600, fn() => Review::avg('rating') ?? 0),
+            'avg_delivery' => '< 24 jam',
+        ];
+
+        // Popular searches from product names (keywords)
+        $popularSearches = Cache::remember('popular_searches', 3600, function() {
+            $products = Product::select('name')->limit(10)->get();
+            $keywords = [];
+            foreach ($products as $product) {
+                $words = explode(' ', $product->name);
+                foreach ($words as $word) {
+                    if (strlen($word) > 3) {
+                        $keywords[] = $word;
+                    }
+                }
+            }
+            return array_unique(array_slice($keywords, 0, 5));
+        });
+
+        // Testimonials from reviews
+        $testimonials = Review::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+
         return view('customer.home', compact(
             'featuredProducts',
             'newProducts',
             'categories',
-            'banners'
+            'banners',
+            'stats',
+            'popularSearches',
+            'testimonials'
         ));
     }
 

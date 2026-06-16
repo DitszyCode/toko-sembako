@@ -46,7 +46,14 @@ Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.cle
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/payment/{order}', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    Route::get('/checkout/finish/{order}', [CheckoutController::class, 'finish'])->name('checkout.finish');
+    Route::get('/checkout/error/{order}', [CheckoutController::class, 'error'])->name('checkout.error');
+    Route::get('/checkout/unfinish/{order}', [CheckoutController::class, 'unfinish'])->name('checkout.unfinish');
 });
+
+// Midtrans Webhook (no auth - called by Midtrans)
+Route::post('/midtrans/notification', [CheckoutController::class, 'notification'])->name('midtrans.notification');
 
 // Orders (auth required)
 Route::middleware('auth')->group(function () {

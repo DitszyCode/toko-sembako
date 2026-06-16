@@ -282,8 +282,11 @@
                     <a href="{{ route('about') }}" class="text-white/80 hover:text-white transition font-medium {{ request()->routeIs('about') ? 'text-white' : '' }}">
                         Tentang Kami
                     </a>
-                    <a href="{{ route('contact') }}" class="text-white/80 hover:text-white transition font-medium {{ request()->routeIs('contact') ? 'text-white' : '' }}">
-                        Kontak
+                    <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 px-4 py-2 rounded-full text-sm font-medium transition {{ request()->routeIs('contact') ? 'bg-green-500/30' : '' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Hubungi Kami
                     </a>
                 </div>
 
@@ -402,9 +405,11 @@
                         <i class="fas fa-info-circle w-5"></i>
                         Tentang Kami
                     </a>
-                    <a href="{{ route('contact') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('contact') ? 'bg-white/10 text-white' : '' }}">
-                        <i class="fas fa-envelope w-5"></i>
-                        Kontak
+                    <a href="{{ route('contact') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition {{ request()->routeIs('contact') ? 'bg-green-500/30' : '' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Hubungi Kami
                     </a>
 
                     @auth
@@ -507,15 +512,15 @@
                     <ul class="space-y-3">
                         <li class="flex items-start gap-3">
                             <i class="fas fa-map-marker-alt text-green-400 mt-1"></i>
-                            <span class="text-white/70 text-sm">Jl. Merdeka No. 123, Jakarta Selatan</span>
+                            <span class="text-white/70 text-sm">Jl. Tembok Dukuh V/50, RT 01/RW 02, Kelurahan Bubutan, Kecamatan Bubutan, Kota Surabaya, Jawa Timur 60173</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fas fa-phone text-green-400"></i>
-                            <span class="text-white/70 text-sm">+62 812-3456-7890</span>
+                            <span class="text-white/70 text-sm">+62 857-7116-8204</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fas fa-envelope text-green-400"></i>
-                            <span class="text-white/70 text-sm">info@tokosembako.com</span>
+                            <span class="text-white/70 text-sm">adityaramadhanikita.x13@gmail.com</span>
                         </li>
                     </ul>
                 </div>

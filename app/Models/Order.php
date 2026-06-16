@@ -16,6 +16,8 @@ class Order extends Model
         'order_number',
         'status',
         'payment_status',
+        'payment_method',
+        'transaction_id',
         'total_amount',
         'recipient_name',
         'recipient_phone',

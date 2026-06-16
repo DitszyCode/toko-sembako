@@ -135,11 +135,11 @@
 
                         <button type="submit" class="w-full glass-btn py-4 rounded-xl text-white font-semibold text-center flex items-center justify-center gap-2">
                             <i class="fas fa-lock"></i>
-                            Pesan Sekarang
+                            Pilih Metode Pembayaran
                         </button>
 
                         <p class="text-white/50 text-xs text-center mt-4">
-                            Dengan melanjutkan, Anda menyetujui Syarat & Ketentuan serta Kebijakan Privasi kami
+                            Pembayaran aman dengan <span class="text-green-400 font-medium">Midtrans</span>
                         </p>
                     </div>
                 </div>

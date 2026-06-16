@@ -17,6 +17,27 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
+        // Calculate growth percentages compared to previous month
+        $currentMonthOrders = Order::whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'))
+            ->count();
+        $previousMonthOrders = Order::whereMonth('created_at', date('m') - 1 > 0 ? date('m') - 1 : 12)
+            ->whereYear('created_at', date('m') - 1 > 0 ? date('Y') : date('Y') - 1)
+            ->count();
+        $ordersGrowth = $previousMonthOrders > 0 ? round((($currentMonthOrders - $previousMonthOrders) / $previousMonthOrders) * 100) : 0;
+
+        $currentMonthRevenue = Order::whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'))
+            ->where('payment_status', 'paid')
+            ->where('status', '!=', 'cancelled')
+            ->sum('total_amount');
+        $previousMonthRevenue = Order::whereMonth('created_at', date('m') - 1 > 0 ? date('m') - 1 : 12)
+            ->whereYear('created_at', date('m') - 1 > 0 ? date('Y') : date('Y') - 1)
+            ->where('payment_status', 'paid')
+            ->where('status', '!=', 'cancelled')
+            ->sum('total_amount');
+        $revenueGrowth = $previousMonthRevenue > 0 ? round((($currentMonthRevenue - $previousMonthRevenue) / $previousMonthRevenue) * 100) : 0;
+
         // Get statistics
         $stats = [
             'total_products' => Product::count(),
@@ -27,6 +48,11 @@ class AdminController extends Controller
             'total_revenue' => Order::where('payment_status', 'paid')
                 ->where('status', '!=', 'cancelled')
                 ->sum('total_amount'),
+            'orders_growth' => $ordersGrowth,
+            'revenue_growth' => $revenueGrowth,
+            'revenue_target' => 10000000, // 10 juta target
+            'orders_target' => 100,
+            'products_target' => 50,
         ];
 
         // Get recent orders
